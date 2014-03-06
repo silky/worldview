@@ -39,9 +39,8 @@ $(function() {
             wv.proj.parse,
             wv.layers.parse,
             wv.date.parse,
-            wv.palettes.parse,
-            wv.data.parse,
-            wv.map.parse
+            wv.palettes.parse//,
+            //wv.data.parse
         ];
 
         _.each(parsers, function(parser) {
@@ -76,7 +75,7 @@ $(function() {
         models.palettes = wv.palettes.model(models, config);
         models.layers   = wv.layers.model(models, config);
         models.date     = wv.date.model({ initial: initialDate });
-        models.data     = wv.data.model(models, config);
+        //models.data     = wv.data.model(models, config);
         models.link     = wv.link.model(config);
 
         // Export for debugging
@@ -97,14 +96,9 @@ $(function() {
             .register(models.layers)
             .register(models.date)
             .register(models.palettes)
-            .register(models.data);
+            ;//.register(models.data);
         models.link.load(state);
         models.proj.change = wv.proj.change(models);
-
-        // Map is special as it actually creates UI components.
-        models.map = wv.map.model(models, config);
-        models.link.register(models.map);
-        models.map.load(state, errors);
 
         // Create widgets
         var ui = {};
@@ -118,9 +112,9 @@ $(function() {
         ui.dateWheels = wv.date.wheels(models, config);
         ui.rubberband = wv.image.rubberband(models, config);
         ui.image = wv.image.panel(models, ui, config);
-        ui.data = wv.data.ui(models, config, map.maps);
+        //ui.data = wv.data.ui(models, config, map.maps);
         // FIXME: Why is this here?
-        ui.data.render();
+        //ui.data.render();
         ui.link = wv.link.ui(models);
         ui.tour = wv.tour(models, ui);
 
@@ -137,10 +131,12 @@ $(function() {
         $("#eventsHolder").hide();
 
         // Wirings
+        /*
         ui.sidebar.events
             .on("dataDownloadSelect", models.data.activate)
             .on("dataDownloadUnselect", models.data.deactivate);
-
+        */
+        /*
         models.data.events
             .on("activate", function() {
                 ui.sidebar.selectTab("download");
@@ -148,6 +144,8 @@ $(function() {
             .on("queryResults", function() {
                 ui.data.onViewChange(models.map.selected);
             });
+        */
+        /*
         models.map.maps.events
             .on("moveEnd", function(map) {
                 ui.data.onViewChange(map);
@@ -155,8 +153,9 @@ $(function() {
             .on("zoomEnd", function(map) {
                 ui.data.onViewChange(map);
             });
+        */
         // FIXME: This is a hack
-        models.map.events.on("projection", models.data.updateProjection);
+        //models.map.events.on("projection", models.data.updateProjection);
 
         // Console notifications
         if ( wv.brand.release() ) {

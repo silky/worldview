@@ -203,6 +203,9 @@ wv.map = wv.map || function(models, config) {
                     found = true;
                 }
             });
+            if ( !found ) {
+                addIndex = iter.length;
+            }
             map.getLayers().insertAt(addIndex, newMapLayer);
         } else {
             map.addLayer(newMapLayer);

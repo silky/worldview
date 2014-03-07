@@ -42,7 +42,6 @@ wv.map = wv.map || function(models, config) {
         models.date.events.on("select", updateDate);
 
         updateProjection();
-
     };
 
     var createMap = function(proj) {
@@ -52,14 +51,16 @@ wv.map = wv.map || function(models, config) {
             .attr("data-projection", proj.id)
             .addClass("map");
         $(selector).append($proj);
+        var scaleControl = new ol.control.ScaleLine();
+        var view = new ol.View2D({
+            projection: ol.proj.get(proj.crs),
+            center: proj.startCenter,
+            zoom: proj.startZoom,
+            maxResolution: proj.resolutions[0],
+            extent: proj.maxExtent
+        });
         var map = new ol.Map({
-            view: new ol.View2D({
-                projection: ol.proj.get(proj.crs),
-                center: proj.startCenter,
-                zoom: proj.startZoom,
-                maxResolution: proj.resolutions[0]//,
-                //extent: proj.maxExtent
-            }),
+            view: view,
             renderer: ["webgl", "canvas", "dom"],
             target: target,
             controls: ol.control.defaults().extend([
@@ -68,17 +69,16 @@ wv.map = wv.map || function(models, config) {
                     target: document.getElementById("full-screen")
                 })
                 */
-               //new ol.control.ScaleLine()
+                scaleControl
             ])
         });
-        map.worldview = { proj: proj };
+        map.worldview = {
+            proj: proj,
+            scaleControl: scaleControl,
+            scaleActive: true
+        };
+        view.on("change:center", onMapMove);
         $proj.hide();
-
-        var layers = models.layers.get({proj: proj.id, reverse: true});
-        _.each(layers, function(layer) {
-            var mapLayer = createLayer(layer, proj);
-            map.addLayer(mapLayer);
-        });
 
         return map;
     };
@@ -267,6 +267,22 @@ wv.map = wv.map || function(models, config) {
 
     var moveLayer = function() {
         refreshLayers();
+    };
+
+    var onMapMove = function() {
+        var map = self.selected;
+        var center = map.getView().getCenter();
+        var extent = map.getView().getProjection().getExtent();
+        var active = center[0] > extent[0] && center[0] < extent[2] &&
+                     center[1] > extent[1] && center[1] < extent[3];
+        if ( active !== map.worldview.scaleActive ) {
+            if ( active ) {
+                map.addControl(map.worldview.scaleControl);
+            } else {
+                map.removeControl(map.worldview.scaleControl);
+            }
+            map.worldview.scaleActive = active;
+        }
     };
 
     var layerKey = function(proj, layer, date) {

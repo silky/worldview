@@ -45,3 +45,12 @@
     background-color: #aaaaaa;
 }
 
+.ol-scale-line {
+    left: auto;
+    bottom: 100px;
+    right: 20px;
+    background-color: rgba(38, 38, 38, 0.7);
+    color: #EEEEEE;
+    font-weight: bold;
+}
+

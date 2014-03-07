@@ -45,12 +45,26 @@
     background-color: #aaaaaa;
 }
 
-.ol-scale-line {
+.ol-scale-line:not([ie8andbelow])  {
     left: auto;
     bottom: 100px;
     right: 20px;
-    background-color: rgba(38, 38, 38, 0.7);
+    background-color: rgba(38, 38, 38, 0.5);
+}
+
+.ol-scale-line-inner {
     color: #EEEEEE;
     font-weight: bold;
 }
 
+.ol-mouse-position {
+    text-align: right;
+    left: auto;
+    top: auto;
+    bottom: 80px;
+    right: 20px;
+    width: 125px;
+    text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
+    color: #ffffff;
+    font-weight: bold;
+}

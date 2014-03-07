@@ -51,7 +51,11 @@ wv.map = wv.map || function(models, config) {
             .attr("data-projection", proj.id)
             .addClass("map");
         $(selector).append($proj);
-        var scaleControl = new ol.control.ScaleLine();
+
+        var scaleControls = [
+            new ol.control.ScaleLine()
+        ];
+
         var view = new ol.View2D({
             projection: ol.proj.get(proj.crs),
             center: proj.startCenter,
@@ -59,22 +63,23 @@ wv.map = wv.map || function(models, config) {
             maxResolution: proj.resolutions[0],
             extent: proj.maxExtent
         });
+        var digits = view.getProjection().getUnits() === "m" ? 0 : 4;
         var map = new ol.Map({
             view: view,
             renderer: ["webgl", "canvas", "dom"],
             target: target,
             controls: ol.control.defaults().extend([
-                /*
-                new ol.control.FullScreen({
-                    target: document.getElementById("full-screen")
-                })
-                */
-                scaleControl
+               new ol.control.MousePosition({
+                   coordinateFormat: ol.coordinate.createStringXY(digits),
+                   projection: proj.crs,
+                   undefinedHTML: '&nbsp;'
+               }),
+               scaleControls[0]
             ])
         });
         map.worldview = {
             proj: proj,
-            scaleControl: scaleControl,
+            scaleControls: scaleControls,
             scaleActive: true
         };
         view.on("change:center", onMapMove);
@@ -276,11 +281,13 @@ wv.map = wv.map || function(models, config) {
         var active = center[0] > extent[0] && center[0] < extent[2] &&
                      center[1] > extent[1] && center[1] < extent[3];
         if ( active !== map.worldview.scaleActive ) {
-            if ( active ) {
-                map.addControl(map.worldview.scaleControl);
-            } else {
-                map.removeControl(map.worldview.scaleControl);
-            }
+            _.each(map.worldview.scaleControls, function(control) {
+                if ( active ) {
+                    map.addControl(control);
+                } else {
+                    map.removeControl(control);
+                }
+            });
             map.worldview.scaleActive = active;
         }
     };

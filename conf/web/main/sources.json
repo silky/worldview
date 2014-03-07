@@ -29,7 +29,7 @@
             ]
         },
         "SEDAC:wms": {
-            "url": "http://sedac.ciesin.columbia.edu/geoserver/ows"
+            "url": ["http://sedac.ciesin.columbia.edu/geoserver/ows"]
         }
     }
 }

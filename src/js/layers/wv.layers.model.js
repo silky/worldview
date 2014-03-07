@@ -70,10 +70,10 @@ wv.layers.model = wv.layers.model || function(models, config) {
         return results;
     };
 
-    self.forGroup = function(group, spec) {
+    self.forGroup = function(group, spec, proj) {
         spec = spec || {};
         var results = [];
-        var groups = self.forProjection();
+        var groups = self.forProjection(proj);
         _.each(groups[group], function(layer) {
             if ( spec.visibleOnly && !self.visible[layer.id] ) {
                 return;
@@ -91,8 +91,9 @@ wv.layers.model = wv.layers.model || function(models, config) {
 
     self.get = function(spec) {
         spec = spec || {};
-        var baselayers = self.forGroup("baselayers", spec);
-        var overlays = self.forGroup("overlays", spec);
+        var proj = spec.proj || null;
+        var baselayers = self.forGroup("baselayers", spec, proj);
+        var overlays = self.forGroup("overlays", spec, proj);
         return baselayers.concat(overlays);
     };
 

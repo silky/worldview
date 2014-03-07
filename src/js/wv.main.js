@@ -77,6 +77,7 @@ $(function() {
         models.date     = wv.date.model({ initial: initialDate });
         //models.data     = wv.data.model(models, config);
         models.link     = wv.link.model(config);
+        models.map      = wv.map(models, config);
 
         // Export for debugging
         wv.models = models;

@@ -60,7 +60,7 @@ wv.map = wv.map || function(models, config) {
                 maxResolution: proj.resolutions[0]//,
                 //extent: proj.maxExtent
             }),
-            renderer: "dom",
+            renderer: ["webgl", "canvas", "dom"],
             target: target,
             controls: ol.control.defaults().extend([
                 /*

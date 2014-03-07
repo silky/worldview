@@ -39,7 +39,8 @@ $(function() {
             wv.proj.parse,
             wv.layers.parse,
             wv.date.parse,
-            wv.palettes.parse//,
+            wv.palettes.parse,
+            wv.map.parse
             //wv.data.parse
         ];
 
@@ -77,8 +78,7 @@ $(function() {
         models.date     = wv.date.model({ initial: initialDate });
         //models.data     = wv.data.model(models, config);
         models.link     = wv.link.model(config);
-        models.map      = wv.map(models, config);
-
+        models.map      = wv.map.model(models, config);
         // Export for debugging
         wv.models = models;
 
@@ -97,6 +97,7 @@ $(function() {
             .register(models.layers)
             .register(models.date)
             .register(models.palettes)
+            .register(models.map);
             ;//.register(models.data);
         models.link.load(state);
         models.proj.change = wv.proj.change(models);
@@ -104,6 +105,7 @@ $(function() {
         // Create widgets
         var ui = {};
 
+        ui.map = wv.map.ui(models, config);
         ui.proj = wv.proj.ui(models);
         ui.sidebar = wv.layers.sidebar(models);
         ui.activeLayers = wv.layers.active(models, config);

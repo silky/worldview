@@ -77,7 +77,11 @@ wv.map.ui = wv.map.ui || function(models, config) {
                    undefinedHTML: '&nbsp;'
                }),
                scaleControls[0]
-            ])
+            ]),
+            deviceOptions: {
+                loadTilesWhileAnimating: false,
+                loadTilesWhileInteracting: false
+            }
         });
         map.worldview = {
             proj: proj,
@@ -280,7 +284,7 @@ wv.map.ui = wv.map.ui || function(models, config) {
         updateExtent();
         var map = self.selected;
         var center = map.getView().getCenter();
-        var extent = map.getView().getProjection().getExtent();
+        var extent = models.proj.selected.maxExtent;
         var active = center[0] > extent[0] && center[0] < extent[2] &&
                      center[1] > extent[1] && center[1] < extent[3];
         if ( active !== map.worldview.scaleActive ) {

@@ -44,6 +44,12 @@ wv.map.ui = wv.map.ui || function(models, config) {
         models.date.events.on("select", updateDate);
 
         updateProjection();
+
+        var proj = models.proj.selected;
+        var view = self.selected.getView();
+        var $map = $("#map [data-projection='" + proj.id + "']");
+        console.log(models.map.extent, $map.width(), $map.height());
+        view.fitExtent(models.map.extent, [$map.width(), $map.height()]);
     };
 
     var createMap = function(proj) {
@@ -77,11 +83,7 @@ wv.map.ui = wv.map.ui || function(models, config) {
                    undefinedHTML: '&nbsp;'
                }),
                scaleControls[0]
-            ]),
-            deviceOptions: {
-                loadTilesWhileAnimating: false,
-                loadTilesWhileInteracting: false
-            }
+            ])
         });
         map.worldview = {
             proj: proj,

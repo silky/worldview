@@ -19,7 +19,7 @@ config["wv"] = {
         "src/ext/main/jquery-1.6.4/jquery.js",
         "src/ext/main/jscache-gitba01cdc/cache.js",
         "src/ext/ui/yui-2.9.0/yui.js",
-        "src/ext/map/openlayers-2.13.1-wv1/OpenLayers.js"
+        "src/ext/map/openlayers-3.0.0.beta2/ol.js"
     ],
     src: [
         "src/js/wv.*.js",

@@ -67,7 +67,7 @@ wv.proj.change = wv.proj.change || function(models) {
         self.events.trigger("select", self);
         if ( polarVisited > 1 && wasOld !== self.old ) {
             checkNotify();
-            wv.map.COORDINATE_CONTROLS.arctic.projection = self.crs;
+            //wv.map.COORDINATE_CONTROLS.arctic.projection = self.crs;
         }
 
         if ( wasOld !== self.old && self.old ) {

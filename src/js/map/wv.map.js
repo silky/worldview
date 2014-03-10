@@ -34,7 +34,11 @@ wv.map = function(self) {
         }
         var extent = [];
         _.each(parts, function(part) {
-            extent.push(parseFloat(part));
+            var f = parseFloat(part);
+            if ( _.isNaN(f) ) {
+                throw new Error("Invalid value: " + part);
+            }
+            extent.push(f);
         });
         return extent;
     };

@@ -335,7 +335,6 @@ wv.map.ui = wv.map.ui || function(models, config) {
     var applyPalette = function(mapLayer, layer) {
         var customId = models.palettes.active[layer.id];
         if ( !customId ) {
-            console.log("clear");
             mapLayer.setLookup(null);
             return;
         }
@@ -343,23 +342,20 @@ wv.map.ui = wv.map.ui || function(models, config) {
         var source = config.palettes.rendered[sourceId];
         var custom = config.palettes.custom[customId];
         var target = wv.palettes.translate(source, custom);
-        console.log("set");
         mapLayer.setLookup({source: source, target: target});
     };
 
     var updatePalette = function(layerId) {
         var layer = config.layers[layerId];
-        console.log("update called");
         _.each(self.proj, function(map) {
             var mapLayers = map.getLayers().getArray();
             _.each(mapLayers, function(mapLayer) {
                 if ( mapLayer.worldview.layer.id === layer.id ) {
-                    console.log("apply");
                     applyPalette(mapLayer, layer);
-                    mapLayer.setSaturation(0.0);
                 }
             });
         });
+        self.selected.render();
     };
 
     var layerKey = function(proj, layer, date) {

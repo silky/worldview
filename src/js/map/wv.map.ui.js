@@ -42,6 +42,8 @@ wv.map.ui = wv.map.ui || function(models, config) {
         models.layers.events.on("visibility", updateVisibility);
         models.layers.events.on("update", moveLayer);
         models.date.events.on("select", updateDate);
+        models.palettes.events.on("add", updatePalette);
+        models.palettes.events.on("remove", updatePalette);
 
         updateProjection();
 
@@ -142,9 +144,7 @@ wv.map.ui = wv.map.ui || function(models, config) {
         wmts.tileUrlFunction = tileUrlFunction(wmts, wmts.tileUrlFunction,
                 models.date.selected);
         var mapLayer = new ol.layer.Tile({source: wmts, visible: false});
-        if ( layer.id === "MODIS_Terra_Aerosol") {
-            mapLayer.setLookupEnabled(true);
-        }
+        applyPalette(mapLayer, layer);
         return mapLayer;
     };
 
@@ -280,6 +280,7 @@ wv.map.ui = wv.map.ui || function(models, config) {
             map.addLayer(mapLayer);
         });
 
+        /*
         var geom = new ol.geom.LineString([
             [0, 0], [10, 0], [10, 10], [0, 10], [0, 0]
         ]);
@@ -298,6 +299,7 @@ wv.map.ui = wv.map.ui || function(models, config) {
             })
         });
         map.addLayer(vl);
+        */
     };
 
     var moveLayer = function() {
@@ -328,6 +330,36 @@ wv.map.ui = wv.map.ui || function(models, config) {
         var extent = self.selected.getView()
                 .calculateExtent([$map.width(), $map.height()]);
         models.map.extent = extent;
+    };
+
+    var applyPalette = function(mapLayer, layer) {
+        var customId = models.palettes.active[layer.id];
+        if ( !customId ) {
+            console.log("clear");
+            mapLayer.setLookup(null);
+            return;
+        }
+        var sourceId = layer.palette.id;
+        var source = config.palettes.rendered[sourceId];
+        var custom = config.palettes.custom[customId];
+        var target = wv.palettes.translate(source, custom);
+        console.log("set");
+        mapLayer.setLookup({source: source, target: target});
+    };
+
+    var updatePalette = function(layerId) {
+        var layer = config.layers[layerId];
+        console.log("update called");
+        _.each(self.proj, function(map) {
+            var mapLayers = map.getLayers().getArray();
+            _.each(mapLayers, function(mapLayer) {
+                if ( mapLayer.worldview.layer.id === layer.id ) {
+                    console.log("apply");
+                    applyPalette(mapLayer, layer);
+                    mapLayer.setSaturation(0.0);
+                }
+            });
+        });
     };
 
     var layerKey = function(proj, layer, date) {

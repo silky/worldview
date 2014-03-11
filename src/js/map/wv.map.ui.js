@@ -142,6 +142,9 @@ wv.map.ui = wv.map.ui || function(models, config) {
         wmts.tileUrlFunction = tileUrlFunction(wmts, wmts.tileUrlFunction,
                 models.date.selected);
         var mapLayer = new ol.layer.Tile({source: wmts, visible: false});
+        if ( layer.id === "MODIS_Terra_Aerosol") {
+            mapLayer.setLookupEnabled(true);
+        }
         return mapLayer;
     };
 
@@ -196,7 +199,7 @@ wv.map.ui = wv.map.ui || function(models, config) {
         $("#map [data-projection='" + proj.id + "']").show();
         var mapLayers = map.getLayers();
         mapLayers.forEach(function(mapLayer) {
-            if ( models.layers.visible[mapLayer.worldview.layer.id] ) {
+            if ( !mapLayer.worldview || models.layers.visible[mapLayer.worldview.layer.id] ) {
                 mapLayer.setVisible(true);
             }
         });
@@ -276,6 +279,25 @@ wv.map.ui = wv.map.ui || function(models, config) {
             }
             map.addLayer(mapLayer);
         });
+
+        var geom = new ol.geom.LineString([
+            [0, 0], [10, 0], [10, 10], [0, 10], [0, 0]
+        ]);
+        var feature = new ol.Feature(geom);
+        var vl = new ol.layer.Image({
+            source: new ol.source.ImageVector({
+                source: new ol.source.Vector({
+                    features: [feature]
+                }),
+                style: new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: "#ff0000",
+                        width: 1
+                    })
+                })
+            })
+        });
+        map.addLayer(vl);
     };
 
     var moveLayer = function() {

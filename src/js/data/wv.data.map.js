@@ -22,10 +22,10 @@ wv.data.map = wv.data.map || function(model, maps, config) {
     var self = {};
     var results = [];
 
-    var selectionLayers = ns.layers.selection(model, maps, config);
-    var swathLayers = ns.layers.swath(model, maps, config);
-    var gridLayers = ns.layers.grid(model, maps, config);
-    var hoverLayers = ns.layers.hover(model, maps, config);
+    //var selectionLayers = ns.layers.selection(model, maps, config);
+    //var swathLayers = ns.layers.swath(model, maps, config);
+    //var gridLayers = ns.layers.grid(model, maps, config);
+    //var hoverLayers = ns.layers.hover(model, maps, config);
     var buttonLayers = ns.layers.button(model, maps, config);
 
     var init = function() {
@@ -35,6 +35,8 @@ wv.data.map = wv.data.map || function(model, maps, config) {
             .on("projectionUpdate", onProjectionUpdate)
             .on("activate", onActivate)
             .on("deactivate", onDeactivate)
+            ;
+            /*
             .on("hoverOver", function(granule) {
                 hoverLayers.hoverOver(granule);
             })
@@ -47,6 +49,7 @@ wv.data.map = wv.data.map || function(model, maps, config) {
             .on("hoverout", function() {
                 hoverLayers.hoverOut();
             });
+            */
     };
 
     var onQueryResults = function(newResults) {
@@ -57,8 +60,8 @@ wv.data.map = wv.data.map || function(model, maps, config) {
         if ( newResults ) {
             results = newResults;
         }
-        swathLayers.update(results);
-        gridLayers.update(results);
+        //swathLayers.update(results);
+        //gridLayers.update(results);
         buttonLayers.update(results);
     };
 
@@ -67,10 +70,10 @@ wv.data.map = wv.data.map || function(model, maps, config) {
     };
 
     var onDeactivate = function() {
-        selectionLayers.dispose();
-        swathLayers.dispose();
-        gridLayers.dispose();
-        hoverLayers.dispose();
+        //selectionLayers.dispose();
+        //swathLayers.dispose();
+        //gridLayers.dispose();
+        //hoverLayers.dispose();
         buttonLayers.dispose();
     };
 
@@ -83,13 +86,10 @@ wv.data.map = wv.data.map || function(model, maps, config) {
     };
 
     var clear = function() {
-        //selectionLayers.clear();
-        swathLayers.clear();
-        gridLayers.clear();
-        hoverLayers.clear();
+        //swathLayers.clear();
+        //gridLayers.clear();
+        //hoverLayers.clear();
         buttonLayers.clear();
-        // TODO: Remove if not used
-        //maskLayers.clear();
     };
 
     init();

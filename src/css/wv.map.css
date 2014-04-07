@@ -24,7 +24,7 @@
     left: auto;
 }
 
-.ol-zoom a:not([ie8andbelow]) {
+.ol-zoom button {
     width: 30px;
     height: 25px;
     background-color: rgba(38, 38, 38, 0.7);
@@ -36,12 +36,12 @@
     vertical-align: middle;
 }
 
-.ol-zoom a:hover:not([ie8andbelow]) {
+.ol-zoom button:hover {
     background-color: #cccccc;
     color: rgba(38, 38, 38, 0.7);
 }
 
-.ol-zoom a:active:not([ie8andbelow]) {
+.ol-zoom button:active {
     background-color: #aaaaaa;
 }
 

@@ -24,6 +24,7 @@ wv.data.layers.button = wv.data.layers.button || function(model, maps, config) {
     var IMAGE_SELECT = "images/data-download-plus-button-orange.svg";
     var IMAGE_UNSELECT = "images/data-download-minus-button-red.svg";
 
+    /*
     var STYLE = {
         "default": {
             externalGraphic: IMAGE_SELECT,
@@ -48,6 +49,14 @@ wv.data.layers.button = wv.data.layers.button || function(model, maps, config) {
             cursor: "pointer"
         }
     };
+    */
+
+    var STYLE = new ol.style.Style({
+        image: new ol.style.Icon({
+            src: IMAGE_SELECT,
+            size: [24, 24]
+        }),
+    });
 
     var features = {};
     var splitFeature = null;
@@ -59,28 +68,26 @@ wv.data.layers.button = wv.data.layers.button || function(model, maps, config) {
     self.events = wv.util.events();
 
     var init = function() {
-        $.each(maps.projections, function(index, map) {
-            map.events.register("zoomend", self, resize);
+        _.each(maps.proj, function(map) {
+            //map.events.register("zoomend", self, resize);
         });
         model.events.on("granuleUnselect", onUnselect);
     };
 
     self.update = function(results) {
         var layer = getLayer();
-        layer.removeAllFeatures();
+        var source = layer.getSource();
+        wv.map.clearFeatures(source);
         features = {};
         var featureList = [];
         var selectedFeatures = [];
-        $.each(results.granules, function(index, granule) {
+        _.each(results.granules, function(granule) {
             if ( !granule.centroid ) {
                 return;
             }
             var centroid = granule.centroid[model.crs];
             if ( centroid ) {
-                var feature = new OpenLayers.Feature.Vector(centroid, {
-                    granule: granule,
-                    label: ""
-                });
+                var feature = new ol.Feature(centroid);
                 featureList.push(feature);
                 features[granule.id] = feature;
                 if ( model.selectedGranules[granule.id] ) {
@@ -88,23 +95,28 @@ wv.data.layers.button = wv.data.layers.button || function(model, maps, config) {
                 }
             }
         });
-        layer.addFeatures(featureList);
+        source.addFeatures(featureList);
+        /*
         var selectionControl = layer.selectionControl;
         $.each(selectedFeatures, function(index, selectedFeature) {
             selectionControl.select(selectedFeature);
         });
+        */
     };
 
     self.clear = function() {
+        /*
         var layer = wv.map.getLayerByName(maps.map, LAYER_NAME);
         if ( layer ) {
             features = {};
             layer.removeAllFeatures();
         }
+        */
     };
 
     self.dispose = function() {
-        $.each(maps.projections, function(index, map) {
+        /*
+        $.each(maps, function(index, map) {
             var layer = wv.map.getLayerByName(map, LAYER_NAME);
             if ( layer ) {
                 map.removeControl(layer.hoverControl);
@@ -112,18 +124,22 @@ wv.data.layers.button = wv.data.layers.button || function(model, maps, config) {
                 map.removeLayer(layer);
             }
         });
+        */
     };
 
     var createLayer = function() {
         size = getSize();
 
-        layer = new OpenLayers.Layer.Vector(LAYER_NAME, {
-            styleMap: new OpenLayers.StyleMap(getStyle())
+        layer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: []
+            }),
+            style: getStyle()
         });
+        layer.name = LAYER_NAME;
+        maps.selected.addLayer(layer);
 
-        layer.div.setAttribute("data-layer-name", LAYER_NAME);
-        maps.map.addLayer(layer);
-
+        /*
         layer.events.on({
             'featureselected': function(event) {
                 model.selectGranule(event.feature.attributes.granule);
@@ -132,7 +148,9 @@ wv.data.layers.button = wv.data.layers.button || function(model, maps, config) {
                 model.unselectGranule(event.feature.attributes.granule);
             }
         });
+        */
 
+        /*
         var hoverControl = new wv.map.HoverControl(layer);
         hoverControl.events.on({
             "hoverover": function(event) {
@@ -156,12 +174,12 @@ wv.data.layers.button = wv.data.layers.button || function(model, maps, config) {
         });
         maps.map.addControl(selectionControl);
         layer.selectionControl = selectionControl;
-
+        */
         return layer;
     };
 
     var getLayer = function(map) {
-        map = map || maps.map;
+        map = map || maps.selected;
         var layer = wv.map.getLayerByName(map, LAYER_NAME);
         if ( !layer ) {
             layer = createLayer();
@@ -170,17 +188,18 @@ wv.data.layers.button = wv.data.layers.button || function(model, maps, config) {
     };
 
     var getSize = function() {
-        var zoom = maps.map.getZoom();
+        var zoom = maps.selected.getView().getZoom();
         // Minimum size of the button is 15 pixels
         var base = 15;
         // Double the size for each zoom level
         var add = Math.pow(2, zoom);
         // But 47 pixels is the maximum size
         var size = Math.min(base + add, base + 32);
-        return new OpenLayers.Size(size, size);
+        return [size, size];
     };
 
     var getStyle = function(intent) {
+        return STYLE;
         var size = getSize();
         var newStyle = $.extend(true, {}, STYLE);
 
@@ -267,7 +286,8 @@ wv.data.layers.grid = wv.data.layers.grid || function(model, maps, config) {
         strokeWidth: 1.5
     };
 
-    var parser = new OpenLayers.Format.GeoJSON();
+    //var parser = new OpenLayers.Format.GeoJSON();
+    var parser = null;
 
     var self = {};
 
@@ -296,7 +316,7 @@ wv.data.layers.grid = wv.data.layers.grid || function(model, maps, config) {
     };
 
     self.dispose = function() {
-        $.each(maps.projections, function(index, map) {
+        $.each(maps, function(index, map) {
             var layer = wv.map.getLayerByName(map, LAYER_NAME);
             if ( layer ) {
                 map.removeLayer(layer);

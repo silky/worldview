@@ -50,7 +50,6 @@ wv.map.ui = wv.map.ui || function(models, config) {
         var proj = models.proj.selected;
         var view = self.selected.getView();
         var $map = $("#map [data-projection='" + proj.id + "']");
-        console.log(models.map.extent, $map.width(), $map.height());
         view.fitExtent(models.map.extent, [$map.width(), $map.height()]);
     };
 
@@ -76,7 +75,7 @@ wv.map.ui = wv.map.ui || function(models, config) {
         var digits = view.getProjection().getUnits() === "m" ? 0 : 4;
         var map = new ol.Map({
             view: view,
-            renderer: ["webgl", "canvas", "dom"],
+            renderer: ["canvas", "dom"],
             target: target,
             controls: ol.control.defaults().extend([
                new ol.control.MousePosition({
@@ -333,6 +332,7 @@ wv.map.ui = wv.map.ui || function(models, config) {
     };
 
     var applyPalette = function(mapLayer, layer) {
+        return;
         var customId = models.palettes.active[layer.id];
         if ( !customId ) {
             mapLayer.setLookup(null);

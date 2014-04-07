@@ -151,6 +151,7 @@ wv.data.results.connectSwaths = function(projection) {
     self.name = "ConnectSwaths";
 
     self.process = function(meta, granule) {
+        return granule;
         if ( !granule.centroid[projection] ) {
             return;
         }
@@ -351,8 +352,9 @@ wv.data.results.extentFilter = function(projection, extent) {
         if ( !geom ) {
             return result;
         }
-        var mbr = geom.getBounds();
-        if ( extent.intersectsBounds(mbr) ) {
+        var mbrGeom = wv.map.extent(geom);
+        var mbrExtent = wv.map.extent(extent);
+        if ( wv.map.intersectsExtents(mbrGeom, mbrExtent) ) {
             return granule;
         }
     };
@@ -379,7 +381,7 @@ wv.data.results.geometryFromECHO = function(densify) {
         if ( !granule.geometry[wv.map.CRS_WGS_84] ) {
             var echoGeom = wv.data.echo.geometry(granule, densify);
             var geom = echoGeom.toOpenLayers();
-            var centroid = geom.getCentroid();
+            var centroid = geom.getInteriorPoint();
             granule.geometry[wv.map.CRS_WGS_84] = geom;
             granule.centroid[wv.map.CRS_WGS_84] = centroid;
         }
@@ -664,7 +666,7 @@ wv.data.results.timeFilter = function(spec) {
             geom =
                 wv.map.adjustAntiMeridian(geom, adjustSign);
             granule.geometry[wv.map.CRS_WGS_84] = geom;
-            granule.centroid[wv.map.CRS_WGS_84] = geom.getCentroid();
+            granule.centroid[wv.map.CRS_WGS_84] = geom.getInteriorPoint();
         }
 
         var x = granule.centroid[wv.map.CRS_WGS_84].x;

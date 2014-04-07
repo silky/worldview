@@ -12,7 +12,7 @@
 var wv = wv || {};
 wv.data = wv.data || {};
 
-wv.data.ui = wv.data.ui || function(models, config) {
+wv.data.ui = wv.data.ui || function(models, ui, config) {
 
     var HTML_WIDGET_INACTIVE = "<img src='images/camera.png'></img>";
     var HTML_WIDGET_ACTIVE = "<img src='images/cameraon.png'></img>";
@@ -24,7 +24,7 @@ wv.data.ui = wv.data.ui || function(models, config) {
     var selectionListPanel = null;
     var downloadListPanel = null;
     var lastResults = null;
-    var maps = models.map.maps;
+    var maps = ui.map;
 
     var self = {};
     self.selector = "#DataDownload";
@@ -170,6 +170,7 @@ wv.data.ui = wv.data.ui || function(models, config) {
    };
 
     self.onViewChange = function(map) {
+        return;
         if ( !model.active || queryActive || !lastResults ) {
             return;
         }

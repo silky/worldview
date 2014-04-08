@@ -70,8 +70,16 @@ wv.data.layers.button = wv.data.layers.button || function(model, maps, config) {
     var init = function() {
         _.each(maps.proj, function(map) {
             //map.events.register("zoomend", self, resize);
+            map.on("click", fooclick);
         });
         model.events.on("granuleUnselect", onUnselect);
+    };
+
+    var fooclick = function(evt) {
+        var pixel = evt.pixel;
+        maps.selected.forEachFeatureAtPixel(pixel, function(feature, layer) {
+            console.log(feature);
+        });
     };
 
     self.update = function(results) {

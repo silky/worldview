@@ -104,8 +104,17 @@ wv.map = function(self) {
         return true;
     };
 
-    self.adjustAntiMeridian = function(geom, adjustSign) {
-        return geom;
+    self.adjustAntiMeridian = function(polygon, adjustSign) {
+        var points = polygon.getLinearRings()[0].getCoordinates();
+        for ( var i = 0; i < points.length; i++ ) {
+            if ( adjustSign > 0 && points[i][0] < 0 ) {
+                points[i][0] = points[i][0] + 360;
+            }
+            if ( adjustSign < 0 && points[i][0] > 0 ) {
+                points[i][0] = points[i][0] - 360;
+            }
+        }
+        return new ol.geom.Polygon([points]);
     };
 
     return self;

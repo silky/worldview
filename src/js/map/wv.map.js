@@ -117,6 +117,14 @@ wv.map = function(self) {
         return new ol.geom.Polygon([points]);
     };
 
+    self.zoomForResolution = function(resolution, resolutions) {
+        for ( var zoom = 0; zoom < resolutions.length; zoom++ ) {
+            if ( resolution === resolutions[zoom] ) {
+                return zoom;
+            }
+        }
+    };
+
     return self;
 
 }(wv.map || {});

@@ -51,14 +51,14 @@ wv.data.layers.button = wv.data.layers.button || function(model, maps, config) {
     };
     */
 
-    var STYLE = new ol.style.Style({
-        image: new ol.style.Icon({
-            src: IMAGE_SELECT,
-            size: [24, 24]
-        }),
-    });
-
+    var map = null;
+    var layer = null;
+    var selectedLayer = null;
+    var styles = [];
+    var selectedStyles = [];
+    var results = [];
     var features = {};
+    var selectedFeatures = {};
     var splitFeature = null;
     var self = {};
 
@@ -68,27 +68,105 @@ wv.data.layers.button = wv.data.layers.button || function(model, maps, config) {
     self.events = wv.util.events();
 
     var init = function() {
-        _.each(maps.proj, function(map) {
-            //map.events.register("zoomend", self, resize);
-            map.on("click", fooclick);
-        });
         model.events.on("granuleUnselect", onUnselect);
     };
 
-    var fooclick = function(evt) {
-        var pixel = evt.pixel;
+    var reinit = function() {
+        mapDispose();
+
+        map = maps.selected;
+        //map.on("singleclick", onClick);
+        $(map.getViewport()).click(onClick);
+
+        var projId = model.projection;
+        var resolutions = config.projections[projId].resolutions;
+        for ( var zoom = 0; zoom < resolutions.length; zoom++ ) {
+            styles[zoom] = new ol.style.Style({
+                image: new ol.style.Icon({
+                    src: IMAGE_SELECT,
+                    size: getSize(zoom)
+                })
+            });
+            selectedStyles[zoom] = new ol.style.Style({
+                image: new ol.style.Icon({
+                    src: IMAGE_UNSELECT,
+                    size: getSize(zoom)
+                })
+            });
+        }
+        layer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: []
+            }),
+            style: function(feature, resolution) {
+               var zoom = wv.map.zoomForResolution(resolution, resolutions);
+               return [styles[zoom]];
+            }
+        });
+        map.addLayer(layer);
+
+        selectedLayer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: []
+            }),
+            style: function(feature, resolution) {
+               var zoom = wv.map.zoomForResolution(resolution, resolutions);
+               return [selectedStyles[zoom]];
+            }
+        });
+        map.addLayer(selectedLayer);
+    };
+
+    var getSize = function(zoom) {
+        // Minimum size of the button is 15 pixels
+        var base = 15;
+        // Double the size for each zoom level
+        var add = Math.pow(2, zoom);
+        // But 47 pixels is the maximum size
+        var size = Math.min(base + add, base + 32);
+        return [size, size];
+    };
+
+    var mapDispose = function() {
+        if ( !map ) {
+            return;
+        }
+        map.removeLayer(layer);
+        map.removeLayer(selectedLayer);
+        map.un("singleclick", onClick);
+    };
+
+    var onClick = function(evt) {
+        console.log("begin");
+        //var pixel = evt.pixel;
+        var pixel = map.getEventPixel(evt.originalEvent);
         maps.selected.forEachFeatureAtPixel(pixel, function(feature, layer) {
             console.log(feature);
+            if ( selectedFeatures[feature.granule.id] ) {
+                console.log("remove");
+                layer.getSource().addFeature(feature);
+                selectedLayer.getSource().removeFeature(feature);
+                delete selectedFeatures[feature.granule.id];
+            } else {
+                console.log("add");
+                selectedLayer.getSource().addFeature(feature);
+                layer.getSource().removeFeature(feature);
+                selectedFeatures[feature.granule.id] = feature;
+            }
         });
+        console.log("end");
     };
 
     self.update = function(results) {
-        var layer = getLayer();
+        if ( map !== maps.selected ) {
+            reinit();
+        }
         var source = layer.getSource();
-        wv.map.clearFeatures(source);
+        wv.map.clearFeatures(layer.getSource());
+        wv.map.clearFeatures(selectedLayer.getSource());
+
         features = {};
-        var featureList = [];
-        var selectedFeatures = [];
+        selectedFeatures = {};
         _.each(results.granules, function(granule) {
             if ( !granule.centroid ) {
                 return;
@@ -96,14 +174,18 @@ wv.data.layers.button = wv.data.layers.button || function(model, maps, config) {
             var centroid = granule.centroid[model.crs];
             if ( centroid ) {
                 var feature = new ol.Feature(centroid);
-                featureList.push(feature);
-                features[granule.id] = feature;
+                feature.granule = granule;
                 if ( model.selectedGranules[granule.id] ) {
-                    selectedFeatures.push(feature);
+                    selectedFeatures[granule.id] = feature;
+                } else {
+                    features[granule.id] = feature;
                 }
             }
         });
-        source.addFeatures(featureList);
+
+        layer.getSource().addFeatures(_.values(features));
+        selectedLayer.getSource().addFeatures(_.values(selectedFeatures));
+
         /*
         var selectionControl = layer.selectionControl;
         $.each(selectedFeatures, function(index, selectedFeature) {
@@ -195,36 +277,7 @@ wv.data.layers.button = wv.data.layers.button || function(model, maps, config) {
         return layer;
     };
 
-    var getSize = function() {
-        var zoom = maps.selected.getView().getZoom();
-        // Minimum size of the button is 15 pixels
-        var base = 15;
-        // Double the size for each zoom level
-        var add = Math.pow(2, zoom);
-        // But 47 pixels is the maximum size
-        var size = Math.min(base + add, base + 32);
-        return [size, size];
-    };
 
-    var getStyle = function(intent) {
-        return STYLE;
-        var size = getSize();
-        var newStyle = $.extend(true, {}, STYLE);
-
-        newStyle["default"].graphicWidth = size.w;
-        newStyle["default"].graphicHeight = size.h;
-        newStyle["default"].labelYOffset = getLabelOffset();
-
-        newStyle.select.graphicWidth = size.w;
-        newStyle.select.graphicHeight = size.h;
-        newStyle.select.labelYOffset = getLabelOffset();
-
-        if ( intent ) {
-            return newStyle[intent];
-        } else {
-            return newStyle;
-        }
-    };
 
     var resize = function() {
         if ( !model.active ) {

@@ -181,6 +181,7 @@ $(function() {
             }
         });
 
+        /*
         if ( layersRemoved > 0 ) {
             wv.ui.notify(
                 "Incomplete configuration<br><br>" +
@@ -189,6 +190,7 @@ $(function() {
                 "<a href='mailto:support@earthdata.nasa.gov'>" +
                 "support@earthdata.nasa.gov</a>");
         }
+        */
     };
 
     /*

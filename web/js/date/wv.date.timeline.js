@@ -91,7 +91,7 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
         data2 = [
             {
                 "x": model.selected.getTime(),
-                "y": "0" 
+                "y": "0"
             },
             {
                 "x": model.selected.getTime(),
@@ -121,12 +121,12 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
             .tickFormat(zoomTimeFormat);
             //.tickFormat(d3.time.format.multi([["%b %Y", function(d) { return d.getUTCMonth(); }], ["%b %Y", function() { return true; }]]));
             //.tickFormat(customTimeFormat2);
-        
+
         yAxis = d3.svg.axis()
             .scale(y)
             .orient("left")
             .ticks(3);
-    
+
         zoom = d3.behavior.zoom()
             .x(x)
             .scale(170)
@@ -140,8 +140,8 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
         //remove all ticks in order to update //FIXME:  Maybe optimize this
         timeline.select(".x.axis").call(xAxis.ticks(0));
 
-        if (interval) { 
-            zoomInterval = interval; 
+        if (interval) {
+            zoomInterval = interval;
             zoomStep = step;
         }
         timeline.select(".x.axis")
@@ -222,7 +222,7 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
                     .attr("class","subtick-background")
                     .attr("height",height-1)
                     .attr("width",subTickBgWidth);
-                
+
             }
         }
         d3.selectAll(".x.axis rect.axis-foreground").on("click",function(){
@@ -260,6 +260,7 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
     };
     var smallTickMouseenter = function(d){
         var tickParent = d3.select(this.parentNode.parentNode);
+        console.log(tickParent);
         var tickDate = d;
         var rectWidth = tickParent.select('rect.axis-background').attr("width");
         if (zoomLvl === 0){
@@ -351,10 +352,10 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
             .keydown(function(event) {
                 if ( event.target.nodeName === "INPUT" ) {
                     /*if((event.keyCode || event.which) === 9){
-                        
+
                         $('.button-input-group').parent().css('border-color','');
                         updateTime();
-                        
+
                     }
                     else*/ return;
                 }
@@ -381,7 +382,7 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
                 if ( event.target.nodeName === "INPUT" ) {
                     return;
                 }
-                switch ( event.keyCode ) { 
+                switch ( event.keyCode ) {
                     case wv.util.key.LEFT:
                     case wv.util.key.RIGHT:
                     case wv.util.key.UP:
@@ -391,7 +392,7 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
                         break;
                 }
             });
-        
+
         d3.select('#timeline-footer')
             .append("svg:svg")
             .attr('width', width + margin.left + margin.right)
@@ -482,20 +483,21 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
             .attr("x","35")
             .attr("y","11");
         var mousedown = false;
-        guitarPick.on("mousedown",function(){  //TODO: Drag slider over small axes
+        d3.select("#guitarpick").on("mousedown",function(){  //TODO: Drag slider over small axes
             mousedown = true;
             d3.event.preventDefault();
             d3.event.stopPropagation();
-            $("#guitarpick").css("pointer-events","none");
         })
         .on("mouseup",function(){
             mousedown = false;
-                        $("#guitarpick").css("pointer-events","");
         });
-        d3.select("#timeline-footer svg").on("mousemove",function(){
+        d3.select("#guitarpick").on("mousemove",function(){
             if (mousedown){
                 var newDate;
                 var mouseDate = x.invert(d3.mouse(this)[0]);
+                console.log(x);
+                var back = x(mouseDate);
+                console.log(mouseDate, back);
                 var currentDate = new Date(model.selected);
                 switch(zoomLvl){
                     case 0:
@@ -522,7 +524,6 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
             if (mousedown){
                 mousedown = false;
                 smallTickMouseleave();
-                $('#guitarpick').css('pointer-events','');
             }
         });
 
@@ -592,7 +593,7 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
             },400);
             $(this).siblings('.button-input-group').focus();
         });
-        
+
         //select all input on focus
         $('input').focus(function(e){
             $(this).select();
@@ -611,7 +612,7 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
             }
             var $interval = $(this).siblings('.button-input-group').attr('id').replace("-input-group", "");
             var $dateVal = $(this).siblings('input.button-input-group');
-            
+
                 switch($interval){
                 case 'day':
                     var numberDate;
@@ -664,7 +665,7 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
                 d3.select("#guitarpick").attr("style","display:none;");
                 $('#timeline').css('right','auto');
             }
-            
+
         });
         model.events.on("select", function(){
             updateTime();
@@ -672,17 +673,17 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
         models.layers.events.on("change",function(){
             if(model.start && model.start.getTime() !== startDateMs){
                 startDateMs = model.start.getTime();
-                //setData();           FIXME: update actual data 
+                //setData();           FIXME: update actual data
             }
         });
 
         $("#focus-guard-1").on('focus',function(){
-           $("#day-input-group").focus().select(); 
+           $("#day-input-group").focus().select();
         });
         $("#focus-guard-2").on('focus',function(){
-           $("#year-input-group").focus().select(); 
+           $("#year-input-group").focus().select();
         });
-        
+
         updateTime();
 
         $('.button-input-group').change(function(){
@@ -704,7 +705,7 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
                         var validStr = false;
                         var newIntInput;
                         newInput = newInput.toUpperCase();
-                        
+
                         for (var i=0;i<monthNames.length;i++){
                             if (newInput === monthNames[i]){
                                 validStr = true;
@@ -722,7 +723,7 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
                     }
                     break;
                 }
-                if(selectedDateObj){ 
+                if(selectedDateObj){
                     model.select(selectedDateObj);
                     $('.button-input-group').parent().css('border-color','');
                 }
@@ -735,7 +736,7 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
         });
 
         $("#day-input-group").blur();
-        
+
         d3.select("#zoom-decades").on("click",function(d){
             $('.zoom-btn').removeClass("zoom-btn-selected");
             $(this).addClass("zoom-btn-selected");
@@ -743,12 +744,12 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
         });
         d3.select("#zoom-years").on("click",function(d){
             setZoomLevel(1);
-        }); 
+        });
         d3.select("#zoom-months").on("click",function(d){
             $('.zoom-btn').removeClass("zoom-btn-selected");
             $(this).addClass("zoom-btn-selected");
             setZoomLevel(2);
-        }); 
+        });
         d3.select("#zoom-weeks").on("click",function(d){
             $('.zoom-btn').removeClass("zoom-btn-selected");
             $(this).addClass("zoom-btn-selected");
@@ -777,7 +778,7 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
             $('#zoom-years').addClass("depth-2").css("font-size","1.2em");
             $('#zoom-months').addClass("depth-3").css("margin","-3px 0 5px 0");
             $('#zoom-weeks').addClass("depth-4");
-            
+
 
             break;
             case 'years':
@@ -878,14 +879,14 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
             smallTickWidth = Math.floor((ticks.data()[i+1].getTime() - ticks.data()[i].getTime())/1000/60/60/24/30);
             break;
             case 2:
-            smallTickWidth = Math.floor((ticks.data()[i+1].getTime() - ticks.data()[i].getTime())/1000/60/60/24);            
+            smallTickWidth = Math.floor((ticks.data()[i+1].getTime() - ticks.data()[i].getTime())/1000/60/60/24);
             break;
             case 3:
             smallTickWidth = Math.floor((ticks.data()[i+1].getTime() - ticks.data()[i].getTime())/1000/60/60);
             break;
-            
+
             default:
-            
+
             break;
         }
 
@@ -909,7 +910,7 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
         ui.anim.interval = interval;
         ui.anim.play("forward");
     };
-    
+
     var animateReverse = function(interval) {
         if ( ui.anim.active ) {
             return;
@@ -918,36 +919,36 @@ wv.date.timeline = wv.date.timeline || function(models, config, ui) {
         ui.anim.interval = interval;
         ui.anim.play("reverse");
     };
-    
+
     var animateEnd = function() {
         ui.anim.stop();
     };
     var zoomLvlTiny = 0;
     var panLimit = function() {
         /*
-          
+
           include boolean to work out the panExtent and return to zoom.translate()
-          
+
         */
-        
+
         var divisor = {h: height / ((y.domain()[1]-y.domain()[0])*zoom.scale()), w: width / ((x.domain()[1]-x.domain()[0])*zoom.scale())},
         minX = -(((x.domain()[0]-x.domain()[1])*zoom.scale())+(panExtent.x[1]-(panExtent.x[1]-(width/divisor.w)))),
         minY = -(((y.domain()[0]-y.domain()[1])*zoom.scale())+(panExtent.y[1]-(panExtent.y[1]-(height*(zoom.scale())/divisor.h))))*divisor.h,
         maxX = -(((x.domain()[0]-x.domain()[1]))+(panExtent.x[1]-panExtent.x[0]))*divisor.w*zoom.scale(),
-        maxY = (((y.domain()[0]-y.domain()[1])*zoom.scale())+(panExtent.y[1]-panExtent.y[0]))*divisor.h*zoom.scale(), 
-        
-        tx = x.domain()[0] < panExtent.x[0] ? 
-            minX : 
-            x.domain()[1] > panExtent.x[1] ? 
-            maxX : 
+        maxY = (((y.domain()[0]-y.domain()[1])*zoom.scale())+(panExtent.y[1]-panExtent.y[0]))*divisor.h*zoom.scale(),
+
+        tx = x.domain()[0] < panExtent.x[0] ?
+            minX :
+            x.domain()[1] > panExtent.x[1] ?
+            maxX :
             zoom.translate()[0],
-        ty = y.domain()[0]  < panExtent.y[0]? 
-            minY : 
-            y.domain()[1] > panExtent.y[1] ? 
-            maxY : 
+        ty = y.domain()[0]  < panExtent.y[0]?
+            minY :
+            y.domain()[1] > panExtent.y[1] ?
+            maxY :
             zoom.translate()[1];
-        
-        return [tx,ty]; 
+
+        return [tx,ty];
     };
     var zoomable = function(e){
         var mousePos = x.invert(d3.mouse(this)[0]);

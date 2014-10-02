@@ -1,0 +1,36 @@
+{
+    "exports": [
+        "ol.Collection#*",
+        "ol.Map#*",
+        "ol.View#*",
+        "ol.control.MousePosition#*",
+        "ol.layer.Layer#*",
+        "ol.layer.Tile#*",
+        "ol.layer.Vector#*",
+        "ol.source.Source#*",
+        "ol.source.GeoJSON#*",
+        "ol.source.Tile#*",
+        "ol.source.TileWMS#*",
+        "ol.source.Vector#*",
+        "ol.source.WMTS#*",
+        "ol.source.XYZ#*",
+        "ol.proj.Projection#*"
+    ],
+    "compile": {
+        "externs": [
+            "externs/geojson.js",
+            "externs/proj4js.js"
+        ],
+        "define": [
+            "ol.ENABLE_IMAGE=false",
+            "ol.ENABLE_NAMED_COLORS=false",
+            "ol.ENABLE_WEBGL=false",
+            "goog.dom.ASSUME_STANDARDS_MODE=true",
+            "goog.DEBUG=false"
+        ],
+        "compilation_level": "ADVANCED_OPTIMIZATIONS",
+        "output_wrapper": "(function(){%output%})();",
+        "use_types_for_optimization": true,
+        "manage_closure_dependencies": true
+    }
+}

@@ -18,7 +18,56 @@ wv.map.ui = wv.map.ui || function(models, config) {
 
     var id = "map";
     var selector = "#" + id;
+    self.events = wv.util.events();
 
+    var map = new ol.Map({
+        view: new ol.View({
+            maxRsolution: 0.5625,
+            projection: ol.proj.get("EPSG:4326"),
+            extent: [-180, -90, 180, 90],
+            center: [0, 0],
+            zoom: 2,
+            maxZoom: 8
+        }),
+        target: "map",
+        renderer: ["canvas", "dom"]
+    });
+    $("#map").show();
+
+    var source = gibs.ol.source.wmts({
+        url: "https://map1{a-c}.vis.earthdata.nasa.gov/wmts-geo/wmts.cgi",
+        layer: "MODIS_Terra_CorrectedReflectance_TrueColor",
+        format: "image/jpeg",
+        matrixSet: "EPSG4326_250m",
+        tileGrid: new ol.tilegrid.WMTS({
+            origin: [-180, 90],
+            resolutions: [
+                0.5625,
+                0.28125,
+                0.140625,
+                0.0703125,
+                0.03515625,
+                0.017578125,
+                0.0087890625,
+                0.00439453125,
+                0.002197265625
+            ],
+            matrixIds: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+            tileSize: 512
+        })
+    });
+    var layer = new ol.layer.Tile({
+        source: source
+    });
+    map.addLayer(layer);
+
+    models.date.events.on("select", function(date) {
+        source.setDate(date);
+    });
+
+    return self;
+
+    /*
     // When the date changes, save the layer so that the tiles remain
     // cached.
     var cache = {};
@@ -659,5 +708,5 @@ wv.map.ui = wv.map.ui || function(models, config) {
 
     init();
     return self;
-
+    */
 };
